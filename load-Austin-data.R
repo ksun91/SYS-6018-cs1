@@ -15,7 +15,14 @@ plot(stores$Long, stores$Lat)
 #figure out how to plot this on top of boundary
 
 crimes <- read.csv("Annual_Crime_Dataset_2015.csv", stringsAsFactors = F)
-# convert GO_X and GO_Y to lat and long, then plot on top of boundary
+crimes <- filter(crimes, GO.X.Coordinate != "") # remove crimes that have no location data
+
+coords <- data.frame(x=crimes$GO.X.Coordinate, y=crimes$GO.Y.Coordinate)
+coordinates(coords) <- c('x','y')
+proj4string(coords) <- CRS("+init=epsg:2277")
+coords_r <- spTransform(coords,CRS("+init=epsg:4326"))
+# The coordinates for the crimes are now correctly transformed (I think), but should
+# we add them back to the crimes data frame? I'll explore that next.
 
 ####
 
