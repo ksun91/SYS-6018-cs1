@@ -1,0 +1,52 @@
+Competitors for Walmart:
+http://www.nasdaq.com/symbol/wmt/competitors
+
+Credit Access (speedy loans)
+https://data.austintexas.gov/Business/Credit-Access-Businesses-Map/efz6-47ik
+
+
+http://www.yellowpages.com/austin-tx/discount-stores
+http://www.yellowpages.com/austin-tx/department-stores
+http://www.yellowpages.com/austin-tx/general-merchandise
+
+University of Virginia/Global Covenant of Religions Ethnolinguistics Research Team (GCR-ERT)
+
+Walmart
+Target 
+Big Lots
+
+
+
+[1] "710 E Ben White Blvd 330"
+[1] "5017 W Hwy 290 100"
+[1] "1030 Norwood Park Blvd 583"
+[1] "Southpark Meadows, 9300 S Interstate 35 0"
+[1] "Svc Rd Sb, 12900 N Interstate Hwy 35 0"
+[1] "2525 W Anderson Ln 174"
+[1] "13201 Ranch Rd 620 N 56"
+[1] "2701 S Interstate 35 88"
+[1] "8201 N FM 620 30"
+[1] "690 Old San Antonio Rd 0"
+[1] "4601 TX-183A Toll Rd 10"
+[1] "10401 Research Blvd 31"
+[1] "4301 W William Cannon Dr 41"
+[1] "Southpark Meadows, J-34, 9900 S IH 35 Frontage Rd 0"
+[1] "South Town Square, 4970 W Hwy 290 0"
+[1] "Gateway Shopping Centers, 9700 N Capital of Texas Hwy 0"
+[1] "10901 Lakeline Mall Dr 5"
+[1] "La Frontera Village, 130 Sundance Pkwy #300 0"
+[1] "8666 Spicewood Springs Rd 4"
+[1] "850 N Bell Blvd #104 1"
+[1] "Mays Crossing Shopping Center, 1201 S Interstate 35 #200 0"
+[1] "8740 Research Blvd 1"
+[1] "7101 W Hwy 71 Ste D1 13"
+[1] "Parmer Crossing, 2506 W Parmer Ln 0" # this one, there are a bunch on that block (2500, 2510, etc.)
+[1] "2300 W Ben White Blvd 118"
+[1] "8601 Research Blvd 41"
+[1] "Capital Plaza Shopping Center, 5621 N I H 35 0"
+[1] "10107 Research Blvd 53"
+[1] "5300 S MoPac Expy 83"
+[1] "10900 Lakeline Mall Dr 28"
+[1] "12901 N Interstate Hwy 35 #3 92"
+[1] "Southpark Meadows, 9500 S IH 35 Frontage Rd 0"
+[1] "11220 FM 2222 10"
