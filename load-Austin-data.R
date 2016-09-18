@@ -12,7 +12,9 @@ plot(boundary)
 
 stores <- read.csv("stores_info.csv", stringsAsFactors = F)
 plot(stores$Long, stores$Lat)
-#figure out how to plot this on top of boundary
+store_coords <- data.frame(x=stores$Long, y=stores$Lat)
+coordinates(store_coords) <- c('x','y')
+plot(store_coords, col="red", add=T)
 
 crimes <- read.csv("Annual_Crime_Dataset_2015.csv", stringsAsFactors = F)
 # convert GO_X and GO_Y to lat and long, then plot on top of boundary
