@@ -17,7 +17,7 @@ boundary <-readOGR(dsn=".", layer="geo_export_7c52f690-58f6-4f4a-96fa-95df45d377
 
 # This will draw the entire map of Austin. Available for export from: 
 # https://data.austintexas.gov/Government/Austin-Police-Sectors-and-Districts/bh6h-vpxb
-boundary <-readOGR(dsn="Austin Police Sectors and Districts", layer="geo_export_7c52f690-58f6-4f4a-96fa-95df45d3770a")
+#boundary <-readOGR(dsn="Austin Police Sectors and Districts", layer="geo_export_7c52f690-58f6-4f4a-96fa-95df45d3770a")
 
 plot(boundary)
 
@@ -60,12 +60,11 @@ kde.est.points = get.grid.points(austin, kde.resolution.meters, FALSE)
 # run and plot KDE, using 500 points from the sample
 kde.est = run.spatial.kde(kde.sample.points, kde.est.points, 500) 
 plot.spatial.kde(kde.est, kde.est.points)
+plot(austin, add=T)
 
 store_meters <- data.frame(x=store.locations.meters[,1], y=store.locations.meters[,2])
-store_coordinates(store_meters) <- c('x','y')
+coordinates(store_meters) <- c('x','y')
 plot(store_meters, col="red", add=T)
-
-plot(austin, add=T)
 
 ####
 
@@ -139,3 +138,4 @@ zeros <- storeCrimeCount[storeCrimeCount$crimes==0, ]
 # what percentage of our data set is zero?
 nrow(zeros) / nrow(stores)
 
+stores <- cbind(stores)
