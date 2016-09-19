@@ -7,12 +7,18 @@ require(dplyr)
 
 source("CrimeUtil.R")
 
-#setwd("~/Documents/DSI/notes/2-SYS-6018/Case Study 1 - crime/SYS-6018-cs1")
+setwd("~/Documents/DSI/notes/2-SYS-6018/Case Study 1 - crime")
 
 # LOAD THE DATA
 # boundary <-readOGR(dsn="Neighborhood-Planning-Areas",layer="geo_export_bf249074-a2fc-4d35-b70e-d75de1175a06")
 # plot(boundary)
+
 boundary <-readOGR(dsn=".", layer="geo_export_7c52f690-58f6-4f4a-96fa-95df45d3770a")
+
+# This will draw the entire map of Austin. Available for export from: 
+# https://data.austintexas.gov/Government/Austin-Police-Sectors-and-Districts/bh6h-vpxb
+boundary <-readOGR(dsn="Austin Police Sectors and Districts", layer="geo_export_7c52f690-58f6-4f4a-96fa-95df45d3770a")
+
 plot(boundary)
 
 stores <- read.csv("stores_info.csv", stringsAsFactors = F)
