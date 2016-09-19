@@ -15,11 +15,14 @@ source("CrimeUtil.R")
 
 boundary <-readOGR(dsn=".", layer="geo_export_7c52f690-58f6-4f4a-96fa-95df45d3770a")
 
+zips <-readOGR(dsn="Zipcodes", layer="geo_export_314dd5e2-dc9d-4a81-b190-c1dd214574c4")
+
 # This will draw the entire map of Austin. Available for export from: 
 # https://data.austintexas.gov/Government/Austin-Police-Sectors-and-Districts/bh6h-vpxb
 #boundary <-readOGR(dsn="Austin Police Sectors and Districts", layer="geo_export_7c52f690-58f6-4f4a-96fa-95df45d3770a")
 
 plot(boundary)
+# plot(zips)
 
 stores <- read.csv("stores_info.csv", stringsAsFactors = F)
 store_coords <- data.frame(x=stores$Long, y=stores$Lat)
@@ -62,7 +65,9 @@ names(crime.locations) <- c("x","y")
 
 kde.sample.points = crime.locations[,c("x","y")]
 
-austin = spTransform(boundary, CRS(proj="+init=epsg:26971"))
+# austin = spTransform(boundary, CRS(proj="+init=epsg:26971"))
+
+zips_a = spTransform(zips, CRS(proj="+init=epsg:26971"))
 
 # get estimation points for KDE
 kde.resolution.meters = 100
@@ -74,6 +79,9 @@ kde.est = run.spatial.kde(kde.sample.points, kde.est.points, 500)
 # plot everything
 plot.spatial.kde(kde.est, kde.est.points)
 plot(austin, add=T)
+
+# plot(zips_a, add=T)
+
 points(storesFULL, 
        col= storesFULL$store, 
        #col = "white",
