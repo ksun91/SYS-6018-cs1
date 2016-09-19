@@ -138,4 +138,6 @@ zeros <- storeCrimeCount[storeCrimeCount$crimes==0, ]
 # what percentage of our data set is zero?
 nrow(zeros) / nrow(stores)
 
-stores <- cbind(stores)
+stores <- cbind(stores, storeCrimeCount$crimes)
+names(stores)[ncol(stores)] <- "crimes2014"
+head(stores)
