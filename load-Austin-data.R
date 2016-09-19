@@ -92,6 +92,6 @@ econ <- read.csv("socio_econ.csv", header=T, stringsAsFactors = F)
 # merge with stores data by zipcode
 master <- merge(stores, econ, by.x = 'zip', by.y = 'Zipcode')
 names(master)[6:7] <- c("Long", "Lat")
-master <- master[,c(1:7, 15:20)]
+master <- master[,c(1:8, 16:21)]
 #####
 #write.csv(master, "MASTER_DATA.csv", row.names=F)
