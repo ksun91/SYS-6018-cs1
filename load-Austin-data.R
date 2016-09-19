@@ -84,3 +84,4 @@ stores <- cbind(stores, storeCrimeCount$crimes)
 names(stores)[ncol(stores)] <- "crimes2014"
 head(stores)
 
+write.csv(stores, "MASTER_DATA.csv")
