@@ -62,7 +62,7 @@ kde.est = run.spatial.kde(kde.sample.points, kde.est.points, 500)
 plot.spatial.kde(kde.est, kde.est.points)
 
 store_meters <- data.frame(x=store.locations.meters[,1], y=store.locations.meters[,2])
-store_coordinates(store_meters) <- c('x','y')
+coordinates(store_meters) <- c('x','y')
 plot(store_meters, col="red", add=T)
 
 plot(austin, add=T)
