@@ -65,7 +65,7 @@ kde.sample.points = crime.locations[,c("x","y")]
 austin = spTransform(boundary, CRS(proj="+init=epsg:26971"))
 
 # get estimation points for KDE
-kde.resolution.meters = 200
+kde.resolution.meters = 100
 kde.est.points = get.grid.points(austin, kde.resolution.meters, FALSE)
 
 # run KDE, using 500 points from the sample
@@ -80,3 +80,9 @@ points(storesFULL,
        pch = storesFULL$walORnot, 
        cex = storesFULL$pointsize)
 ######
+
+# ATTEMPT TO GET PREDICTIONS FROM KDE FOR EACH STORE (failure so far)
+store.locations <- as.data.frame(store.locations.meters)
+names(store.locations) <- c("x","y")
+store.points = store.locations[,c("x","y")]
+kde.stores.est = run.spatial.kde(kde.sample.points, store.points, 500) 

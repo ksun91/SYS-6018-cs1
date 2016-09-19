@@ -1,4 +1,5 @@
 require(gdata)
+library(dplyr)
 
 #setwd("~/Documents/DSI/notes/2-SYS-6018/Case Study 1 - crime/SYS-6018-cs1")
 
@@ -88,5 +89,9 @@ head(stores)
 ##### bring in economic data
 econ <- read.csv("socio_econ.csv", header=T, stringsAsFactors = F)
 
+# merge with stores data by zipcode
+master <- merge(stores, econ, by.x = 'zip', by.y = 'Zipcode')
+names(master)[6:7] <- c("Long", "Lat")
+master <- master[,c(1:7, 15:20)]
 #####
-#write.csv(stores, "MASTER_DATA.csv")
+#write.csv(master, "MASTER_DATA.csv", row.names=F)
