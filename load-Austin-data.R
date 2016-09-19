@@ -7,7 +7,7 @@ require(dplyr)
 
 source("CrimeUtil.R")
 
-setwd("~/Documents/DSI/notes/2-SYS-6018/Case Study 1 - crime")
+#setwd("~/Documents/DSI/notes/2-SYS-6018/Case Study 1 - crime/SYS-6018-cs1")
 
 # LOAD THE DATA
 # boundary <-readOGR(dsn="Neighborhood-Planning-Areas",layer="geo_export_bf249074-a2fc-4d35-b70e-d75de1175a06")
