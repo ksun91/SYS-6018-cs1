@@ -3,18 +3,22 @@ library(ks)
 library(RColorBrewer)
 require(rgdal)
 library(MASS)
+require(dplyr)
+
+source("CrimeUtil.R")
 
 setwd("~/Documents/DSI/notes/2-SYS-6018/Case Study 1 - crime")
 
 # LOAD THE DATA
-boundary <-readOGR(dsn="Neighborhood-Planning-Areas",layer="geo_export_bf249074-a2fc-4d35-b70e-d75de1175a06")
+# boundary <-readOGR(dsn="Neighborhood-Planning-Areas",layer="geo_export_bf249074-a2fc-4d35-b70e-d75de1175a06")
+# plot(boundary)
+boundary <-readOGR(dsn=".", layer="geo_export_7c52f690-58f6-4f4a-96fa-95df45d3770a")
 plot(boundary)
 
 stores <- read.csv("stores_info.csv", stringsAsFactors = F)
-plot(stores$Long, stores$Lat)
 store_coords <- data.frame(x=stores$Long, y=stores$Lat)
 coordinates(store_coords) <- c('x','y')
-plot(store_coords, col="red", add=T)
+plot(store_coords, col="blue", add=T)
 
 crimes <- read.csv("Annual_Crime_Dataset_2015.csv", stringsAsFactors = F)
 crimes <- filter(crimes, GO.X.Coordinate != "") # remove crimes that have no location data
@@ -23,8 +27,39 @@ coords <- data.frame(x=crimes$GO.X.Coordinate, y=crimes$GO.Y.Coordinate)
 coordinates(coords) <- c('x','y')
 proj4string(coords) <- CRS("+init=epsg:2277")
 coords_r <- spTransform(coords,CRS("+init=epsg:4326"))
-# The coordinates for the crimes are now correctly transformed (I think), but should
-# we add them back to the crimes data frame? I'll explore that next.
+
+crimes$long <- coordinates(coords_r)[,1]
+crimes$lat <- coordinates(coords_r)[,2]
+
+# Reproject crime lon/lat points to meters
+crime.locations.lonlat = cbind(crimes$long, crimes$lat)
+crime.locations.meters = project(crime.locations.lonlat, proj="+init=epsg:26971")
+
+# Reproject store location points to meters
+store.locations.lonlat = cbind(stores$Long, stores$Lat)
+store.locations.meters = project(store.locations.lonlat, proj="+init=epsg:26971")
+
+# Create data frame from crime.locations.meters
+crime.locations <- as.data.frame(crime.locations.meters)
+names(crime.locations) <- c("x","y")
+
+kde.sample.points = crime.locations[,c("x","y")]
+
+austin = spTransform(boundary, CRS(proj="+init=epsg:26971"))
+
+# get estimation points for KDE
+kde.resolution.meters = 200
+kde.est.points = get.grid.points(austin, kde.resolution.meters, FALSE)
+
+# run and plot KDE, using 500 points from the sample
+kde.est = run.spatial.kde(kde.sample.points, kde.est.points, 500) 
+plot.spatial.kde(kde.est, kde.est.points)
+
+store_meters <- data.frame(x=store.locations.meters[,1], y=store.locations.meters[,2])
+store_coordinates(store_meters) <- c('x','y')
+plot(store_meters, col="red", add=T)
+
+plot(austin, add=T)
 
 ####
 
