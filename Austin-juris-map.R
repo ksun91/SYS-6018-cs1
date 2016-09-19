@@ -45,6 +45,17 @@ crime.locations.meters = project(crime.locations.lonlat, proj="+init=epsg:26971"
 store.locations.lonlat = cbind(stores$Long, stores$Lat)
 store.locations.meters = project(store.locations.lonlat, proj="+init=epsg:26971")
 
+#####
+# Reproject store location (BUT TRY TO KEEP THE OTHER INFO)
+store.locations.lonlat = cbind(stores$Long, stores$Lat)
+store.locations.meters = project(store.locations.lonlat, proj="+init=epsg:26971")
+storesFULL <- cbind(stores, store.locations.meters)
+storesFULL$store <- as.factor(storesFULL$store)
+storesFULL$walORnot <- ifelse(storesFULL$store=="Walmart", 19, 18)
+storesFULL$pointsize <- ifelse(storesFULL$store=="Walmart", 2, 1)
+coordinates(storesFULL) <- c('1','2')
+#####
+
 # Create data frame from crime.locations.meters
 crime.locations <- as.data.frame(crime.locations.meters)
 names(crime.locations) <- c("x","y")
@@ -57,11 +68,15 @@ austin = spTransform(boundary, CRS(proj="+init=epsg:26971"))
 kde.resolution.meters = 200
 kde.est.points = get.grid.points(austin, kde.resolution.meters, FALSE)
 
-# run and plot KDE, using 500 points from the sample
+# run KDE, using 500 points from the sample
 kde.est = run.spatial.kde(kde.sample.points, kde.est.points, 500) 
+
+# plot everything
 plot.spatial.kde(kde.est, kde.est.points)
 plot(austin, add=T)
-
-store_meters <- data.frame(x=store.locations.meters[,1], y=store.locations.meters[,2])
-coordinates(store_meters) <- c('x','y')
-plot(store_meters, col="red", add=T)
+points(storesFULL, 
+       col= storesFULL$store, 
+       #col = "white",
+       pch = storesFULL$walORnot, 
+       cex = storesFULL$pointsize)
+######

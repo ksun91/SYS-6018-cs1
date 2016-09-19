@@ -80,8 +80,13 @@ zeros <- storeCrimeCount[storeCrimeCount$crimes==0, ]
 # what percentage of our data set is zero?
 nrow(zeros) / nrow(stores)
 
-stores <- cbind(stores, storeCrimeCount$crimes)
+# create data.frame with store info and total crimes count
+stores <- cbind(stores, as.numeric(storeCrimeCount$crimes))
 names(stores)[ncol(stores)] <- "crimes2014"
 head(stores)
 
-write.csv(stores, "MASTER_DATA.csv")
+##### bring in economic data
+econ <- read.csv("socio_econ.csv", header=T, stringsAsFactors = F)
+
+#####
+#write.csv(stores, "MASTER_DATA.csv")
