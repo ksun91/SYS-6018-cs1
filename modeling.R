@@ -1,5 +1,7 @@
 master <- read.csv("MASTER_DATA.csv", stringsAsFactors = F, header=T)
 master$wal <- ifelse(master$store=="Walmart", 1, 0)
+master$normalizedCrime <- master$crimes2014 / master$Percentage.hours.open.per.week
+master$crimesPerHour <- master$crimes2014 / (master$Hours.open.per.week * 52)
 
 mod1 <- lm(crimes2014 ~ AvgIncome + MedIncome + CollegeGradPercent, data = master)
 mod2 <- lm(crimes2014 ~ store + AvgIncome + MedIncome + CollegeGradPercent, data = master)
@@ -19,9 +21,12 @@ mod2w <- lm(crimes2014 ~ wal + AvgIncome + MedIncome + CollegeGradPercent, data 
 
 mod12w <- lm(crimes2014 ~ KDEraw + CollegeGradPercent + closest_stops_in_meters + wal, data = master)
 
-
 summary(mod9)
 summary(mod9w)
+
+## crimes per hours(ish)
+modh1 <- lm(normalizedCrime ~ KDEraw + CollegeGradPercent + wal, data = master)
+summary(modh1)
 
 preds1 <- data.frame(store = as.factor(master$store),
                      actual = master$crimes2014, 

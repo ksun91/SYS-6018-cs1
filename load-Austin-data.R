@@ -101,6 +101,10 @@ master <- merge(master, kde, by = c("store", "address"))
 bus <- read.csv("stores_stops.csv", header=T, stringsAsFactors = F)
 master <- merge(master, bus, by = "address")
 
+##### bring in bus stop data
+hours <- read.xls("store_hours.xlsx", header=T, sheet = 1)
+master <- merge(master, hours, by = c("store", "address"))
+
 
 ##### subset and save master
 master <- subset(master, 
