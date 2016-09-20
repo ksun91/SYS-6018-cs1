@@ -107,3 +107,15 @@ master <- subset(master,
                  select = -c(X.VALUE., NA., Lat.y, Long.y, City, State,
                     average.SAT.score, High.school.drop., TotStud))
 #write.csv(master, "MASTER_DATA.csv", row.names=F)
+
+storesIndex <- numeric()
+for (i in 1:length(scdf)){
+  storesIndex <- c(storesIndex, row.names(scdf[[i]]))
+}
+
+storesIndex <- as.numeric(storesIndex)
+crimesNotStores <- crimes[-storesIndex, ]
+#write.csv(crimesNotStores, "crimesNotStores.csv", row.names=F)
+
+crimesStores <- crimes[storesIndex, ]
+crimesAtStores <- as.data.frame(table(crimesStores$GO.Highest.Offense.Desc))
