@@ -59,13 +59,29 @@ storesFULL$pointsize <- ifelse(storesFULL$store=="Walmart", 2, 1)
 coordinates(storesFULL) <- c('1','2')
 #####
 
+# Add distance to closest bus stops in meters from each store location
+
+# Source for MetroBus lines/MetroRail stops: 
+# https://data.texas.gov/Capital-Metro/GTFS/r4v4-vz24
+st <- read.table("stops.txt", sep=",", header=T)
+stops <- as.matrix(select(st, stop_lon, stop_lat))
+stops.meters = project(stops, proj="+init=epsg:26971")
+
+# Find the shortest distance in meters to the closest bus stop from
+# each store address
+closest.stops <- data.frame(get.min.distances(store.locations.meters,stops.meters))
+names(closest.stops) <- 'closest stop in meters'
+storesFULL$stops <- closest.stops
+
+#####
+
 # Create data frame from crime.locations.meters
 crime.locations <- as.data.frame(crime.locations.meters)
 names(crime.locations) <- c("x","y")
 
 kde.sample.points = crime.locations[,c("x","y")]
 
-# austin = spTransform(boundary, CRS(proj="+init=epsg:26971"))
+austin = spTransform(boundary, CRS(proj="+init=epsg:26971"))
 
 zips_a = spTransform(zips, CRS(proj="+init=epsg:26971"))
 
