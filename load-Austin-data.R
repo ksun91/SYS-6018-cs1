@@ -101,9 +101,25 @@ master <- merge(master, kde, by = c("store", "address"))
 bus <- read.csv("stores_stops.csv", header=T, stringsAsFactors = F)
 master <- merge(master, bus, by = "address")
 
+##### bring in bus stop data
+hours <- read.xls("store_hours.xlsx", header=T, sheet = 1)
+master <- merge(master, hours, by = c("store", "address"))
+
 
 ##### subset and save master
 master <- subset(master, 
                  select = -c(X.VALUE., NA., Lat.y, Long.y, City, State,
                     average.SAT.score, High.school.drop., TotStud))
 #write.csv(master, "MASTER_DATA.csv", row.names=F)
+
+storesIndex <- numeric()
+for (i in 1:length(scdf)){
+  storesIndex <- c(storesIndex, row.names(scdf[[i]]))
+}
+
+storesIndex <- as.numeric(storesIndex)
+crimesNotStores <- crimes[-storesIndex, ]
+#write.csv(crimesNotStores, "crimesNotStores.csv", row.names=F)
+
+crimesStores <- crimes[storesIndex, ]
+crimesAtStores <- as.data.frame(table(crimesStores$GO.Highest.Offense.Desc))

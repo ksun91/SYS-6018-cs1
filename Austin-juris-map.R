@@ -29,7 +29,8 @@ store_coords <- data.frame(x=stores$Long, y=stores$Lat)
 coordinates(store_coords) <- c('x','y')
 plot(store_coords, col="blue", add=T)
 
-crimes <- read.csv("Annual_Crime_Dataset_2015.csv", stringsAsFactors = F)
+#crimes <- read.csv("Annual_Crime_Dataset_2015.csv", stringsAsFactors = F)
+crimes <- read.csv("crimesNotStores.csv", stringsAsFactors = F)
 crimes <- filter(crimes, GO.X.Coordinate != "") # remove crimes that have no location data
 
 coords <- data.frame(x=crimes$GO.X.Coordinate, y=crimes$GO.Y.Coordinate)
@@ -114,6 +115,6 @@ store.locations <- as.data.frame(store.locations.meters)
 names(store.locations) <- c("x","y")
 store.points = store.locations[,c("x","y")]
 kde.stores.est = run.spatial.kde(kde.sample.points, store.points, 500) 
-storesKDE <- cbind(stores[,1:2], kde.stores.est, kde.stores.est*nrow(crimes))
-names(storesKDE)[3:4] <- c("KDEraw", "KDEscaled")
+storesKDE <- cbind(stores[,1:2], kde.stores.est)
+names(storesKDE)[3] <- "KDEraw"
 write.csv(storesKDE, "storesKDE.csv", row.names = F)
