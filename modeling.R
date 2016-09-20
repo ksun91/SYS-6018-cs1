@@ -1,6 +1,5 @@
 master <- read.csv("MASTER_DATA.csv", stringsAsFactors = F, header=T)
 
-
 mod1 <- lm(crimes2014 ~ AvgIncome + MedIncome + CollegeGradPercent, data = master)
 mod2 <- lm(crimes2014 ~ store + AvgIncome + MedIncome + CollegeGradPercent, data = master)
 mod3 <- lm(crimes2014 ~ CollegeGradPercent, data = master)
@@ -11,6 +10,9 @@ mod7 <- lm(crimes2014 ~ KDEraw, data = master)
 mod8 <- lm(crimes2014 ~ KDEscaled, data = master)
 mod9 <- lm(crimes2014 ~ KDEraw + store, data = master)
 mod10 <- lm(crimes2014 ~ KDEraw + store + CollegeGradPercent, data = master)
+mod11 <- lm(crimes2014 ~ CollegeGradPercent + closest_stops_in_meters + store, data = master)
+mod12 <- lm(crimes2014 ~ KDEraw + closest_stops_in_meters + store, data = master)
+
 
 preds1 <- data.frame(store = as.factor(master$store),
                      actual = master$crimes2014, 

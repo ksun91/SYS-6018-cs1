@@ -97,8 +97,13 @@ names(master)[6:7] <- c("Long", "Lat")
 kde <- read.csv("storesKDE.csv", header=T, stringsAsFactors = F)
 master <- merge(master, kde, by = c("store", "address"))
 
+##### bring in bus stop data
+bus <- read.csv("stores_stops.csv", header=T, stringsAsFactors = F)
+master <- merge(master, bus, by = "address")
+
+
 ##### subset and save master
 master <- subset(master, 
-                 select = -c(X., NA., Lat.y, Long.y, City, State,
+                 select = -c(X.VALUE., NA., Lat.y, Long.y, City, State,
                     average.SAT.score, High.school.drop., TotStud))
 #write.csv(master, "MASTER_DATA.csv", row.names=F)
