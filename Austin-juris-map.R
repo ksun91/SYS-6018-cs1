@@ -94,12 +94,15 @@ kde.est.points = get.grid.points(austin, kde.resolution.meters, FALSE)
 # run KDE, using 500 points from the sample
 kde.est = run.spatial.kde(kde.sample.points, kde.est.points, 500) 
 
-# plot everything
+##### PLOT
+# plot KDE of crimes
 plot.spatial.kde(kde.est, kde.est.points)
-plot(austin, add=T)
 
-# plot(zips_a, add=T)
+# plot city lines
+plot(austin, add=T) # police jurisdictions and city limits
+#plot(zips_a, add=T) # zip codes
 
+# plot stores
 points(storesFULL, 
        col= storesFULL$store, 
        #col = "white",
@@ -107,8 +110,11 @@ points(storesFULL,
        cex = storesFULL$pointsize)
 ######
 
-# ATTEMPT TO GET PREDICTIONS FROM KDE FOR EACH STORE (failure so far)
+# SIDEBAR: get KDE prediction for store points and save as .csv
 store.locations <- as.data.frame(store.locations.meters)
 names(store.locations) <- c("x","y")
 store.points = store.locations[,c("x","y")]
 kde.stores.est = run.spatial.kde(kde.sample.points, store.points, 500) 
+storesKDE <- cbind(stores[,1:2], kde.stores.est, kde.stores.est*nrow(crimes))
+names(storesKDE)[3:4] <- c("KDEraw", "KDEscaled")
+write.csv(storesKDE, "storesKDE.csv", row.names = F)
