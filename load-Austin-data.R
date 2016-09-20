@@ -1,4 +1,5 @@
 require(gdata)
+library(MASS)
 library(dplyr)
 
 #setwd("~/Documents/DSI/notes/2-SYS-6018/Case Study 1 - crime/SYS-6018-cs1")
