@@ -60,6 +60,7 @@ coordinates(storesFULL) <- c('1','2')
 #####
 
 # Add distance to closest bus stops in meters from each store location
+# NOTE: This code needs to be run after 'Load-Austin-data.R'
 
 # Source for MetroBus lines/MetroRail stops: 
 # https://data.texas.gov/Capital-Metro/GTFS/r4v4-vz24
@@ -70,10 +71,11 @@ stops.meters = project(stops, proj="+init=epsg:26971")
 # Find the shortest distance in meters to the closest bus stop from
 # each store address
 closest.stops <- data.frame(get.min.distances(store.locations.meters,stops.meters))
-names(closest.stops) <- 'closest stop in meters'
-storesFULL$stops <- closest.stops
-
-#####
+names(closest.stops) <- 'closest stops in meters'
+stores_stops <- cbind(stores, closest.stops)
+stores_stops <- select(stores_stops, address, `closest stops in meters`)
+# This next line will not run unless 'master' has been created in 'Load-Austin-data.R'
+master <- merge(master, stores_stops, by.x = 'address', by.y = 'address')
 
 # Create data frame from crime.locations.meters
 crime.locations <- as.data.frame(crime.locations.meters)
