@@ -124,7 +124,6 @@ summary(modh4)
 
 preds1 <- data.frame(store = as.factor(master$store),
                      actual = master$crimes2015, 
-                     mod1 = predict(mod1),
                      mod2 = predict(mod2),
                      mod4 = predict(mod4),
                      mod7 = predict(mod7),
