@@ -1,8 +1,10 @@
+#setwd("~/Documents/DSI/notes/2-SYS-6018/Case Study 1 - crime/SYS-6018-cs1")
+
 require(gdata)
 library(MASS)
 library(dplyr)
-
-#setwd("~/Documents/DSI/notes/2-SYS-6018/Case Study 1 - crime/SYS-6018-cs1")
+require(ks)
+source("CrimeUtil.R")
 
 # LOAD THE DATA
 stores <- read.csv("stores_info.csv", stringsAsFactors = F)
@@ -61,12 +63,6 @@ addyPart <- function(addToCheck, addS) {
   }
 }
 
-### FAKE UNIT TEST
-#addyPart("Ben White 710", c("710", "E", "Ben", "White", "Blvd")) # should be TRUE
-#addyPart("Ben White", c("710", "E", "Ben", "White", "Blvd")) # should be FALSE
-#bw <- getCrimes("710 E Ben White Blvd", crimes)
-
-
 ##BEGIN Removing commas from various appropriate columns in econ dataframe ~Kevin Sun
 # econ$AvgIncome <- as.numeric(gsub(",","",econ$AvgIncome))
 # econ$MedIncome <- as.numeric(gsub(",","",econ$MedIncome))
@@ -90,10 +86,11 @@ zeros <- storeCrimeCount[storeCrimeCount$crimes==0, ]
 # what percentage of our data set is zero?
 nrow(zeros) / nrow(stores)
 
-# create data.frame with store info and total crimes count
+# create data.frame with store info and total crimes count ## OR load it below from a .csv
 stores <- cbind(stores, as.numeric(storeCrimeCount$crimes))
-names(stores)[ncol(stores)] <- "crimes2014"
+names(stores)[ncol(stores)] <- "crimes2015"
 head(stores)
+
 
 ##### bring in economic data
 econ <- read.csv("socio_econ.csv", header=T, stringsAsFactors = F)
@@ -102,34 +99,10 @@ names(master)[6:7] <- c("Long", "Lat")
 #####
 
 ##### bring in KDE data
-kde <- read.csv("storesKDE.csv", header=T, stringsAsFactors = F)
-master <- merge(master, kde, by = c("store", "address"))
+# kde <- read.csv("storesKDE.csv", header=T, stringsAsFactors = F)
+# master <- merge(master, kde, by = c("store", "address"))
 
-##### bring in bus stop data
-bus <- read.csv("stores_stops.csv", header=T, stringsAsFactors = F)
-master <- merge(master, bus, by = "address")
-
-##### bring in bus stop data
-hours <- read.xls("store_hours.xlsx", header=T, sheet = 1)
-master <- merge(master, hours, by = c("store", "address"))
-
-
-##### subset and save master
-master <- subset(master, 
-                 select = -c(X.VALUE., NA., Lat.y, Long.y, City, State,
-                    average.SAT.score, High.school.drop., TotStud))
-#write.csv(master, "MASTER_DATA.csv", row.names=F)
-
-###BEGIN Subset and save master2 ~ Kevin Sun
-#Removing duplicate column names in master (crimes2014)
-master <- master[, !duplicated(colnames(master))]
-#Removing unncessary columns
-master <- subset(master, 
-                 select = -c(Lat.y, Long.y, City, State,
-                             average.SAT.score, High.school.drop., TotStud))
-#write.csv(master, "MASTER_DATA.csv", row.names=F)
-### END Subset and save master 2 ~ Kevin Sun
-
+# subset out all crimes NOT at the stores we're analyzing
 storesIndex <- numeric()
 for (i in 1:length(scdf)){
   storesIndex <- c(storesIndex, row.names(scdf[[i]]))
@@ -139,5 +112,69 @@ storesIndex <- as.numeric(storesIndex)
 crimesNotStores <- crimes[-storesIndex, ]
 #write.csv(crimesNotStores, "crimesNotStores.csv", row.names=F)
 
-crimesStores <- crimes[storesIndex, ]
-crimesAtStores <- as.data.frame(table(crimesStores$GO.Highest.Offense.Desc))
+# # subset out crimes AT the stores
+# crimesStores <- crimes[storesIndex, ]
+# crimesAtStores <- as.data.frame(table(crimesStores$GO.Highest.Offense.Desc))
+
+# remove crimes that have no location data
+CNS <- filter(crimesNotStores, GO.X.Coordinate != "") 
+
+# reproject crimes data for KDE purposes
+coords <- data.frame(x=CNS$GO.X.Coordinate, y=CNS$GO.Y.Coordinate)
+coordinates(coords) <- c('x','y')
+proj4string(coords) <- CRS("+init=epsg:2277")
+coords_r <- spTransform(coords,CRS("+init=epsg:4326"))
+# set as coordinates
+CNS$long <- coordinates(coords_r)[,1]
+CNS$lat <- coordinates(coords_r)[,2]
+# Reproject crime lon/lat points to meters
+crime.locations.lonlat = cbind(CNS$long, CNS$lat)
+crime.locations.meters = project(crime.locations.lonlat, proj="+init=epsg:26971")
+# Create data frame from crime.locations.meters
+crime.locations <- as.data.frame(crime.locations.meters)
+names(crime.locations) <- c("x","y")
+kde.sample.points = crime.locations[,c("x","y")]
+
+# Reproject store points for KDE purposes
+# store_coords <- data.frame(x=stores$Long, y=stores$Lat)
+# coordinates(store_coords) <- c('x','y')
+# Reproject store location points to meters
+store.locations.lonlat = cbind(stores$Long, stores$Lat)
+store.locations.meters = project(store.locations.lonlat, proj="+init=epsg:26971")
+# Create data frame from store.locations.meters
+store.locations <- as.data.frame(store.locations.meters)
+names(store.locations) <- c("x","y")
+store.points = store.locations[,c("x","y")]
+# get KDE prediction for store points and save as .csv
+kde.stores.est = run.spatial.kde(kde.sample.points, store.points, 5000) # THIS TAKE A MINUTE (could decrease the sample size if we wanted it run quicker)
+storesKDE <- cbind(stores[,1:2], kde.stores.est)
+names(storesKDE)[3] <- "KDEraw"
+#write.csv(storesKDE, "storesKDE5000.csv", row.names = F)
+
+# merge KDE with master
+master <- merge(master, storesKDE, by = c("store", "address"))
+
+##### bring in bus stop data
+bus <- read.csv("stores_stops.csv", header=T, stringsAsFactors = F)
+master <- merge(master, bus, by = "address")
+
+##### bring in store hours data
+hours <- read.xls("store_hours.xlsx", header=T, sheet = 1)
+master <- merge(master, hours, by = c("store", "address"))
+
+
+##### subset and save master
+master <- subset(master, 
+                 select = -c(X, Lat.y, Long.y, City, State,
+                    average.SAT.score, High.school.drop., TotStud))
+#write.csv(master, "MASTER_DATA.csv", row.names=F)
+
+# ###BEGIN Subset and save master2 ~ Kevin Sun
+# #Removing duplicate column names in master (crimes2015)
+# master <- master[, !duplicated(colnames(master))]
+# #Removing unncessary columns
+# master <- subset(master,
+#                  select = -c(Lat.y, Long.y, City, State,
+#                              average.SAT.score, High.school.drop., TotStud))
+# #write.csv(master, "MASTER_DATA.csv", row.names=F)
+# ### END Subset and save master 2 ~ Kevin Sun

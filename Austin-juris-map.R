@@ -109,12 +109,3 @@ points(storesFULL,
        pch = storesFULL$walORnot, 
        cex = storesFULL$pointsize)
 ######
-
-# SIDEBAR: get KDE prediction for store points and save as .csv
-store.locations <- as.data.frame(store.locations.meters)
-names(store.locations) <- c("x","y")
-store.points = store.locations[,c("x","y")]
-kde.stores.est = run.spatial.kde(kde.sample.points, store.points, 500) 
-storesKDE <- cbind(stores[,1:2], kde.stores.est)
-names(storesKDE)[3] <- "KDEraw"
-write.csv(storesKDE, "storesKDE.csv", row.names = F)
