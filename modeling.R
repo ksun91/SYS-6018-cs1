@@ -89,21 +89,40 @@ vif(mult.3.h)
 summary(mult.3.h)
 # when we do it on normalizedCrime, same thing, but population is also significant
 
+##
+sigVars <- function(mod) {
+  for (i in 1:nrow(summary(mod)$coefficients)) {
+    if (summary(mod)$coefficients[i,4] < 0.05) {
+      print(paste(row.names(summary(mod9w)$coefficients)[i], summary(mod)$coefficients[i,4]))
+    }
+  }
+}
 
 
 #######
 
 mod3 <- lm(crimes2015 ~ CollegeGradPercent, data = master)
+sigVars(mod3)
 mod4 <- lm(crimes2015 ~ CollegeGradPercent + wal, data = master)
+sigVars(mod4)
 mod5 <- lm(crimes2015 ~ CollegeGradPercent + PovertyLine + wal, data = master)
+sigVars(mod5)
 mod6 <- lm(crimes2015 ~ PovertyLine + wal, data = master)
+sigVars(mod6)
 mod7 <- lm(crimes2015 ~ KDEraw, data = master)
+sigVars(mod7)
 mod9 <- lm(crimes2015 ~ KDEraw + store, data = master)
+sigVars(mod9)
 mod9w <- lm(crimes2015 ~ KDEraw + wal, data = master)
+sigVars(mod9w)
 mod10 <- lm(crimes2015 ~ KDEraw + store + CollegeGradPercent, data = master)
+sigVars(mod10)
 mod10w <- lm(crimes2015 ~ KDEraw + wal + CollegeGradPercent, data = master)
+sigVars(mod10w)
 mod11 <- lm(crimes2015 ~ CollegeGradPercent + closest_stops_in_meters + store, data = master)
+sigVars(mod11)
 mod12 <- lm(crimes2015 ~ KDEraw + closest_stops_in_meters + wal, data = master)
+sigVars(mod12)
 
 #
 summary(mod9)
@@ -112,9 +131,11 @@ summary(mod9w)
 ## crimes per hours(ish)
 modh1 <- lm(normalizedCrime ~ KDEraw + CollegeGradPercent + wal, data = master)
 summary(modh1)
+sigVars(modh1)
 
 modh2 <- lm(normalizedCrime ~ KDEraw + PovertyLine + wal, data = master)
 summary(modh2)
+
 
 modh3 <- lm(normalizedCrime ~ KDEraw + Population + wal, data = master)
 summary(modh3)
@@ -124,8 +145,6 @@ summary(modh4)
 
 preds1 <- data.frame(store = as.factor(master$store),
                      actual = master$crimes2015, 
-                     mod1 = predict(mod1),
-                     mod2 = predict(mod2),
                      mod4 = predict(mod4),
                      mod7 = predict(mod7),
                      mod9 = predict(mod9),
