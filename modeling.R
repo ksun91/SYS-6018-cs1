@@ -3,9 +3,7 @@ library('car')
 
 master <- read.csv("MASTER_DATA.csv", stringsAsFactors = F, header=T)
 master$wal <- ifelse(master$store=="Walmart", 1, 0)
-###!!! Did not find the column 'Percentage.hours.open.per.week' for master ~Kevin Sun
 master$normalizedCrime <- master$crimes2015 / master$Percentage.hours.open.per.week
-###!!! Did not find the column 'Hours.open.per.week' for master ~Kevin Sun
 master$crimesPerHour <- master$crimes2015 / (master$Hours.open.per.week * 52)
 
 ### Testing Multicollinearity for Income idea ~ Kevin Sun
@@ -59,30 +57,70 @@ mod.income.12 <- lm(crimes2015 ~ PovertyLine + IncomeInequality, data = master) 
 
 ### END Multicollinearity for Income idea ~ Kevin Sun
 
-mod1 <- lm(crimes2015 ~ AvgIncome + MedIncome + CollegeGradPercent, data = master)
-mod2 <- lm(crimes2015 ~ store + AvgIncome + MedIncome + CollegeGradPercent, data = master)
+### Look at Multicollinearity for other measures
+mult.1 <- lm(crimes2015 ~ Population + CollegeGradPercent + PovertyLine + KDEraw + 
+               closest_stops_in_meters +  Hours.open.per.week, 
+             data = master)
+vif(mult.1)
+# these all look good
+summary(mult.1) # weirdly, hours is the only significant variable...
+
+# now try it without hours
+mult.2 <- lm(crimes2015 ~ Population + CollegeGradPercent + PovertyLine + KDEraw + closest_stops_in_meters, 
+             data = master)
+vif(mult.2)
+summary(mult.2) # no multicollinearity, but also no significance to the model...
+
+mult.3 <- lm(crimes2015 ~ wal + Population + CollegeGradPercent + PovertyLine + KDEraw + closest_stops_in_meters, 
+             data = master)
+vif(mult.3)
+summary(mult.3)
+
+# NOW FOR REAL MODELS
+mult.3 <- lm(crimes2015 ~ wal + Population + CollegeGradPercent + PovertyLine + KDEraw + closest_stops_in_meters, 
+             data = master)
+vif(mult.3)
+summary(mult.3)
+# when we throw in Walmart, there's still no multicollinearity, and it's the only significant variable
+
+mult.3.h <- lm(normalizedCrime ~ wal + Population + CollegeGradPercent + PovertyLine + KDEraw + closest_stops_in_meters, 
+             data = master)
+vif(mult.3.h)
+summary(mult.3.h)
+# when we do it on normalizedCrime, same thing, but population is also significant
+
+
+
+#######
+
 mod3 <- lm(crimes2015 ~ CollegeGradPercent, data = master)
-mod4 <- lm(crimes2015 ~ CollegeGradPercent + store, data = master)
-mod5 <- lm(crimes2015 ~ CollegeGradPercent + AvgIncome + store, data = master)
-mod6 <- lm(crimes2015 ~ AvgIncome + store, data = master)
+mod4 <- lm(crimes2015 ~ CollegeGradPercent + wal, data = master)
+mod5 <- lm(crimes2015 ~ CollegeGradPercent + PovertyLine + wal, data = master)
+mod6 <- lm(crimes2015 ~ PovertyLine + wal, data = master)
 mod7 <- lm(crimes2015 ~ KDEraw, data = master)
 mod9 <- lm(crimes2015 ~ KDEraw + store, data = master)
+mod9w <- lm(crimes2015 ~ KDEraw + wal, data = master)
 mod10 <- lm(crimes2015 ~ KDEraw + store + CollegeGradPercent, data = master)
 mod10w <- lm(crimes2015 ~ KDEraw + wal + CollegeGradPercent, data = master)
 mod11 <- lm(crimes2015 ~ CollegeGradPercent + closest_stops_in_meters + store, data = master)
-mod12 <- lm(crimes2015 ~ KDEraw + closest_stops_in_meters + store, data = master)
+mod12 <- lm(crimes2015 ~ KDEraw + closest_stops_in_meters + wal, data = master)
 
-mod9w <- lm(crimes2015 ~ KDEraw + wal, data = master)
-mod2w <- lm(crimes2015 ~ wal + AvgIncome + MedIncome + CollegeGradPercent, data = master)
-
-mod12w <- lm(crimes2015 ~ KDEraw + CollegeGradPercent + closest_stops_in_meters + wal, data = master)
-
+#
 summary(mod9)
 summary(mod9w)
 
 ## crimes per hours(ish)
 modh1 <- lm(normalizedCrime ~ KDEraw + CollegeGradPercent + wal, data = master)
 summary(modh1)
+
+modh2 <- lm(normalizedCrime ~ KDEraw + PovertyLine + wal, data = master)
+summary(modh2)
+
+modh3 <- lm(normalizedCrime ~ KDEraw + Population + wal, data = master)
+summary(modh3)
+
+modh4 <- lm(normalizedCrime ~ KDEraw + wal, data = master)
+summary(modh4)
 
 preds1 <- data.frame(store = as.factor(master$store),
                      actual = master$crimes2015, 
@@ -93,6 +131,8 @@ preds1 <- data.frame(store = as.factor(master$store),
                      mod9 = predict(mod9),
                      mod9w = predict(mod9w),
                      mod10 = predict(mod10))
+#order them by the actual observed amount of crime
+preds1 <- preds1[order(preds1$actual), ]
 
 # plot values
 plot(preds1$actual, pch=as.numeric(preds1$store))
@@ -106,11 +146,11 @@ points(preds1$mod10, col="yellow")
 
 # plot residuals
 plot(resid(mod4), col="red")
+abline(h=0, lty=2)
 points(resid(mod7), col="green")
 points(resid(mod9), col="blue")
 points(resid(mod9w), col="purple")
 #### mod9 is better higher up, but they're close low
-abline(h=0, lty=2)
 
 # MSE
 
