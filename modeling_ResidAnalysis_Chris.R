@@ -5,7 +5,7 @@
 #    mod9w (crimes ~ KDEraw + wal)
 
 # modh3:
-plot(rstudent(modh3))
+plot(rstudent(modh3)); abline(h=0, lty=2)
 # Analysis: There is a clear funnel pattern, indicating non-constant
 # variance and that some type of transformation is likely needed
 
@@ -22,8 +22,9 @@ summary(modh3.t1)
 summary(modh3.t2) # This appears to be better on all fronts
 
 # Now examine the residual plots
-plot(rstudent(modh3.t1))
-plot(rstudent(modh3.t2)) # better, but not ideal
+plot(rstudent(modh3.t1)); abline(h=0, lty=2)
+plot(rstudent(modh3.t2)); abline(h=0, lty=2) # better, but not ideal
+
 # Analysis: Although there is still a discernable pattern
 # in the plot for the R-student residuals for the model
 # using the transform sqrt(nomalizedCrime), it is much
@@ -31,9 +32,10 @@ plot(rstudent(modh3.t2)) # better, but not ideal
 # plot of a horizontal band centered around 0.
 
 # mod9w:
-plot(rstudent(mod9w))
-# Analysis: There is a clear funnel pattern, indicating non-constant
-# variance and that some type of transformation is likely needed
+plot(rstudent(mod9w)); abline(h=0, lty=2)
+# Analysis: While there is still some slight funnel pattern, other than one very large
+# outlier, things look fairly good.
+# We will try the same transforms to see if they improve things:
 
 # Try two different approaches for transforming y
 mod9w.t1 <- lm(log(crimes2015) ~ KDEraw + wal, data = master)
@@ -44,15 +46,26 @@ summary(mod9w.t1)
 summary(mod9w.t2) # This appears to be better on most fronts
 
 # Now examine the residual plots
-plot(rstudent(mod9w.t1)) # appears to be better, although has some issues
-plot(rstudent(mod9w.t2)) 
-# Analysis: Although the summary statistics for the transformed model with sqrt(crimes2015)
-# appear to be better on most fronts, we would likely want to go with the model using
-# the log transformation of y, as the R-student residual plot for that model is better 
-# at approximating the random distribution of residuals in a horizontal band around 0. 
-# That said, there are still some issues; there do appear to be some error points that seem
-# to be correlated, as we can make out a number of different lines of points in the plot, and
-# unlike the residual plot for the sqrt transform, we have a point very close to 3 SD below 
-# the mean.
+plot(rstudent(mod9w.t1)); abline(h=0, lty=2) # appears to be better, although has some issues
+plot(rstudent(mod9w.t2)); abline(h=0, lty=2) 
+
+#########
+# mod13:
+plot(rstudent(mod13)); abline(h=0, lty=2)
+# Analysis: There is a clear funnel pattern, indicating non-constant
+# variance and that some type of transformation is likely needed
+
+# Try two different approaches for transforming y
+mod13.t1 <- lm(log(crimes2015) ~ Population + wal, data = master)
+mod13.t2 <- lm(sqrt(crimes2015) ~ Population + wal, data = master)
+
+# Look at summary statistics for both
+summary(mod13.t1)
+summary(mod13.t2) # This appears to be better on most fronts
+
+# Now examine the residual plots
+plot(rstudent(mod13.t1)); abline(h=0, lty=2) # appears to be better, although has some issues
+plot(rstudent(mod13.t2)); abline(h=0, lty=2) 
+# Analysis: Again, the sqrt(y) model offers some improvements.
 
 ####
