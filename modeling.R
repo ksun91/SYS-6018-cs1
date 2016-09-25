@@ -63,7 +63,9 @@ mult.1 <- lm(crimes2015 ~ Population + CollegeGradPercent + PovertyLine + KDEraw
              data = master)
 vif(mult.1)
 # these all look good
-summary(mult.1) # weirdly, hours is the only significant variable...
+summary(mult.1) # weirdly, hours is the only significant variable, 
+                # perhaps because it's effectively a stand-in for Walmart because
+                # it's the only one open 24 hours a day.
 
 # now try it without hours
 mult.2 <- lm(crimes2015 ~ Population + CollegeGradPercent + PovertyLine + KDEraw + closest_stops_in_meters, 
@@ -136,7 +138,6 @@ sigVars(modh1)
 modh2 <- lm(normalizedCrime ~ KDEraw + PovertyLine + wal, data = master)
 summary(modh2)
 
-
 modh3 <- lm(normalizedCrime ~ KDEraw + Population + wal, data = master)
 summary(modh3)
 
@@ -203,4 +204,33 @@ plot(preds1$actual - preds1$mod9, pch=as.numeric(preds1$store), col="blue")
 points(preds1$actual - preds1$mod9w, pch=as.numeric(preds1$store), col="purple")
 abline(h=0, lty=2)
 
+######
+wl <- master[22, ]
 
+wcopy <- wl
+for (i in 1:4) {
+  wcopy <- rbind(wcopy, wl)
+}
+
+for (i in 1:5) {
+  wcopy$store[i] <- unique(master$store)[i]
+}
+wcopy$wal <- ifelse(wcopy$store=="Walmart", 1, 0)
+
+plot(predict(mod9, newdata=wcopy),
+    ylim = c(0, 300),
+    ylab = "Predicted Crime",
+    xaxt = 'n')
+    axis(1, at=1:5, labels=unique(master$store))
+
+plot(predict(lm(crimes2015 ~ store + Population, data=master), newdata=wcopy),
+    ylab = "Predicted Crime",
+    xaxt = 'n')
+    axis(1, at=1:5, labels=unique(master$store))
+
+plot(predict(lm(crimes2015 ~ store, data=master), 
+             newdata=wcopy),
+     ylim = c(0, 300),
+     ylab = "Predicted Crime",
+     xaxt = 'n')
+axis(1, at=1:5, labels=unique(master$store))
