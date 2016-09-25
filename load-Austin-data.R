@@ -7,9 +7,9 @@ require(ks)
 source("CrimeUtil.R")
 
 # LOAD THE DATA
-stores <- read.csv("stores_info.csv", stringsAsFactors = F)
+stores <- read.csv("data/stores_info.csv", stringsAsFactors = F)
 
-crimes <- read.csv("Annual_Crime_Dataset_2015.csv", stringsAsFactors = F)
+crimes <- read.csv("data/Annual_Crime_Dataset_2015.csv", stringsAsFactors = F)
 crimes <- filter(crimes, GO.X.Coordinate != "") # remove crimes that have no location data
 
 ####
@@ -67,7 +67,7 @@ addyPart <- function(addToCheck, addS) {
 # econ$AvgIncome <- as.numeric(gsub(",","",econ$AvgIncome))
 # econ$MedIncome <- as.numeric(gsub(",","",econ$MedIncome))
 # econ$IncomeInequality <- as.numeric(gsub(",","",econ$IncomeInequality))
-# write.csv(econ, "socio_econ.csv")
+# write.csv(econ, "data/socio_econ.csv")
 ###END Removing commas from various appropriate columns in econ dataframe ~Kevin Sun
 
 # make a list with a data frame for each store and all its crimes
@@ -93,15 +93,12 @@ head(stores)
 
 
 ##### bring in economic data
-econ <- read.csv("socio_econ.csv", header=T, stringsAsFactors = F)
+econ <- read.csv("data/socio_econ.csv", header=T, stringsAsFactors = F)
 master <- merge(stores, econ, by.x = 'zip', by.y = 'Zipcode')
 names(master)[6:7] <- c("Long", "Lat")
 #####
 
 ##### bring in KDE data
-# kde <- read.csv("storesKDE.csv", header=T, stringsAsFactors = F)
-# master <- merge(master, kde, by = c("store", "address"))
-
 # subset out all crimes NOT at the stores we're analyzing
 storesIndex <- numeric()
 for (i in 1:length(scdf)){
@@ -110,7 +107,7 @@ for (i in 1:length(scdf)){
 
 storesIndex <- as.numeric(storesIndex)
 crimesNotStores <- crimes[-storesIndex, ]
-#write.csv(crimesNotStores, "crimesNotStores.csv", row.names=F)
+#write.csv(crimesNotStores, "data/crimesNotStores.csv", row.names=F)
 
 # # subset out crimes AT the stores
 # crimesStores <- crimes[storesIndex, ]
@@ -149,17 +146,17 @@ store.points = store.locations[,c("x","y")]
 kde.stores.est = run.spatial.kde(kde.sample.points, store.points, 5000) # THIS TAKE A MINUTE (could decrease the sample size if we wanted it run quicker)
 storesKDE <- cbind(stores[,1:2], kde.stores.est)
 names(storesKDE)[3] <- "KDEraw"
-#write.csv(storesKDE, "storesKDE5000.csv", row.names = F)
+#write.csv(storesKDE, "data/storesKDE5000.csv", row.names = F)
 
 # merge KDE with master
 master <- merge(master, storesKDE, by = c("store", "address"))
 
 ##### bring in bus stop data
-bus <- read.csv("stores_stops.csv", header=T, stringsAsFactors = F)
+bus <- read.csv("data/stores_stops.csv", header=T, stringsAsFactors = F)
 master <- merge(master, bus, by = "address")
 
 ##### bring in store hours data
-hours <- read.xls("store_hours.xlsx", header=T, sheet = 1)
+hours <- read.xls("data/store_hours.xlsx", header=T, sheet = 1)
 master <- merge(master, hours, by = c("store", "address"))
 
 

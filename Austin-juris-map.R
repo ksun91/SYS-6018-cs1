@@ -10,27 +10,24 @@ source("CrimeUtil.R")
 #setwd("~/Documents/DSI/notes/2-SYS-6018/Case Study 1 - crime/SYS-6018-cs1")
 
 # LOAD THE DATA
-# boundary <-readOGR(dsn="Neighborhood-Planning-Areas",layer="geo_export_bf249074-a2fc-4d35-b70e-d75de1175a06")
-# plot(boundary)
-
-boundary <-readOGR(dsn=".", layer="geo_export_7c52f690-58f6-4f4a-96fa-95df45d3770a")
-
-zips <-readOGR(dsn="Zipcodes", layer="geo_export_314dd5e2-dc9d-4a81-b190-c1dd214574c4")
-
 # This will draw the entire map of Austin. Available for export from: 
 # https://data.austintexas.gov/Government/Austin-Police-Sectors-and-Districts/bh6h-vpxb
-#boundary <-readOGR(dsn="Austin Police Sectors and Districts", layer="geo_export_7c52f690-58f6-4f4a-96fa-95df45d3770a")
+boundary <-readOGR(dsn="Austin-police-districts", layer="geo_export_7c52f690-58f6-4f4a-96fa-95df45d3770a")
+# alternately, you can draw zip code boundaries (by uncommenting the plot call near the bottom)
+zips <-readOGR(dsn="Zipcodes", layer="geo_export_314dd5e2-dc9d-4a81-b190-c1dd214574c4")
 
+# plot city lines and store locations, just to check they loaded
 plot(boundary)
-# plot(zips)
-
-stores <- read.csv("stores_info.csv", stringsAsFactors = F)
+# plot(zips) # uncomment this to plot zip code lines instead
+##load and plot store locations
+stores <- read.csv("data/stores_info.csv", stringsAsFactors = F)
 store_coords <- data.frame(x=stores$Long, y=stores$Lat)
 coordinates(store_coords) <- c('x','y')
 plot(store_coords, col="blue", add=T)
 
-#crimes <- read.csv("Annual_Crime_Dataset_2015.csv", stringsAsFactors = F)
-crimes <- read.csv("crimesNotStores.csv", stringsAsFactors = F)
+##load crimes data
+#crimes <- read.csv("data/Annual_Crime_Dataset_2015.csv", stringsAsFactors = F) # uncomment this instead to load crime data INCLUDING crimes that happened AT the stores
+crimes <- read.csv("data/crimesNotStores.csv", stringsAsFactors = F)
 crimes <- filter(crimes, GO.X.Coordinate != "") # remove crimes that have no location data
 
 coords <- data.frame(x=crimes$GO.X.Coordinate, y=crimes$GO.Y.Coordinate)
@@ -48,11 +45,6 @@ crime.locations.meters = project(crime.locations.lonlat, proj="+init=epsg:26971"
 # Reproject store location points to meters
 store.locations.lonlat = cbind(stores$Long, stores$Lat)
 store.locations.meters = project(store.locations.lonlat, proj="+init=epsg:26971")
-
-#####
-# Reproject store location (BUT TRY TO KEEP THE OTHER INFO)
-store.locations.lonlat = cbind(stores$Long, stores$Lat)
-store.locations.meters = project(store.locations.lonlat, proj="+init=epsg:26971")
 storesFULL <- cbind(stores, store.locations.meters)
 storesFULL$store <- as.factor(storesFULL$store)
 storesFULL$walORnot <- ifelse(storesFULL$store=="Walmart", 19, 18)
@@ -65,7 +57,7 @@ coordinates(storesFULL) <- c('1','2')
 
 # Source for MetroBus lines/MetroRail stops: 
 # https://data.texas.gov/Capital-Metro/GTFS/r4v4-vz24
-st <- read.table("stops.txt", sep=",", header=T)
+st <- read.table("data/stops.txt", sep=",", header=T)
 stops <- as.matrix(select(st, stop_lon, stop_lat))
 stops.meters = project(stops, proj="+init=epsg:26971")
 
@@ -75,7 +67,7 @@ closest.stops <- data.frame(get.min.distances(store.locations.meters,stops.meter
 names(closest.stops) <- 'closest_stops_in_meters'
 stores_stops <- cbind(stores, closest.stops)
 stores_stops <- select(stores_stops, address, `closest_stops_in_meters`)
-write.csv(stores_stops, "stores_stops.csv", row.names=F)
+write.csv(stores_stops, "data/stores_stops.csv", row.names=F)
 
 # Create data frame from crime.locations.meters
 crime.locations <- as.data.frame(crime.locations.meters)

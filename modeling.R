@@ -198,8 +198,8 @@ summary(mod13)
 ##that the impact of Walmart is real and significant.
 
 ## NOW LOOK AT NORMALIZED CRIME
-## to control for the fact that Walmarts are often open for more hours each day than 
-## the other stores, we now to a similar analysis, but normalize the amount of crime by looking at
+## to control for the fact that Walmarts are often open for more hours each day than the other 
+## stores, we now do a similar analysis, but normalize the amount of crime by looking at
 ## crimes in 2015, divided by percentage of possible hours in a week that the store is open.
 
 ## first check for multicollinearity
@@ -293,7 +293,13 @@ sigVars(modh4)
 modh5 <- lm(normalizedCrime ~ Population + wal, data = master)
 sigVars(modh5)
 
-## TO SEE THE DIFFERENCE THAT WALMART IS MAKING, we make a fake data set
+vif(modh3)
+
+# We choose modh3 as the optimal model for normalizedCrime. Though KDEraw does not show
+# up as significant, it still has a higher adj. R^2 than using only Population and wal,
+# and it does not show any collinearity in the VIF.
+
+## TO VISUALIZE THE DIFFERENCE THAT WALMART IS MAKING, we make a fake data set
 # with the data from one store above (a Walmart) but copied 5 times and with the
 # store name changed each time. Thus, all the other stats are the same for each
 # row, but with a different store name. The predictions from several models are plotted below.
@@ -413,4 +419,16 @@ plot(rstudent(mod13.t1)); abline(h=0, lty=2) # appears to be better, although ha
 plot(rstudent(mod13.t2)); abline(h=0, lty=2) 
 # Analysis: Again, the sqrt(y) model offers some improvements.
 
-####
+#########
+# IN SUMMARY:
+# Our optimal model for prediction was mod13.t2 which transforms the response variable to
+# sqrt(crimes2015) in order to capture the non-linear relationship, and uses only 
+# Population + wal for the predictors. 
+# 
+# Throughout all the models we tested, the only variable that was significant EVERY time
+# was whether or not the store was a Walmart. Furthermore, it was the MOST significant variable
+# in almost every model. This is a strong indication that, even when controlling for a number
+# of socio-economic and geographic factors, Walmarts have significantly more crime than 
+# similar stores.
+
+
