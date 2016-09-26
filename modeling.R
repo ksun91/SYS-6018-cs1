@@ -11,33 +11,33 @@ master$crimesPerHour <- master$crimes2015 / (master$Hours.open.per.week * 52)
 
 ## TESTING FOR MULTICOLLINEARITY
 ### Top-down approach: starting with ALL variables
-vif.t1 <- lm(normalizedCrime~MedIncome + Population + AvgIncome + CollegeGradPercent + IncomeInequality + Unemployment + 
-               PovertyLine + KDEraw + closest_stops_in_meters + wal, data = master)
-vif(vif.t1)
-# MedIncome > 10, remove from model
 
-vif.t2 <- lm(normalizedCrime~Population + AvgIncome + CollegeGradPercent + IncomeInequality + Unemployment + 
+vif.t0 <- lm(crimes2015~MedIncome + Population + AvgIncome + CollegeGradPercent + IncomeInequality + Unemployment + 
                PovertyLine + KDEraw + closest_stops_in_meters + wal, data = master)
-vif(vif.t2)
-# Poverty line > 10, remove from model
+vif(vif.t0)
+# PovertyLine > 30, remove from model
 
-vif.t3 <- lm(normalizedCrime~Population + AvgIncome + CollegeGradPercent + IncomeInequality + Unemployment + 
+vif.t1 <- lm(crimes2015~MedIncome + Population + AvgIncome + CollegeGradPercent + IncomeInequality + Unemployment + 
                KDEraw + closest_stops_in_meters + wal, data = master)
-vif(vif.t3)
+vif(vif.t1)
+# MedIncome > 5, remove from model
 
+vif.t2 <- lm(crimes2015~Population + AvgIncome + CollegeGradPercent + IncomeInequality + Unemployment + 
+               KDEraw + closest_stops_in_meters + wal, data = master)
+vif(vif.t2)
 # College grad percent > 5, remove from model
 
-vif.t4 <- lm(normalizedCrime~Population + AvgIncome + IncomeInequality + Unemployment + 
+vif.t3 <- lm(crimes2015~Population + AvgIncome + IncomeInequality + Unemployment + 
                KDEraw + closest_stops_in_meters + wal, data = master)
-vif(vif.t4)
+vif(vif.t3)
 # All variables have VIF less than 5
 
 # removing IncomeInequality, since it was not calculated with Gini index
-vif.t5 <- lm(normalizedCrime~Population + AvgIncome  + Unemployment + 
+vif.t4 <- lm(crimes2015~Population + AvgIncome  + Unemployment + 
                KDEraw + closest_stops_in_meters + wal, data = master)
 
+summary(vif.t3)
 summary(vif.t4)
-summary(vif.t5)
 # CONCLUSION (for top-down multicollinearity testing):
 # When beginning with all variables, and iteratively removing each variable with the highest VIF, we
 # arrive a model with only wal, and to a lesser extent Population, as the only significant variables
