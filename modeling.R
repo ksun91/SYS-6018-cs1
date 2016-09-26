@@ -420,8 +420,7 @@ plot(rstudent(modh3.t2)); abline(h=0, lty=2) # better, but not ideal
 ######
 # mod9w:
 plot(rstudent(mod9w)); abline(h=0, lty=2)
-# Analysis: While there is still some slight funnel pattern, other than one very large
-# outlier, things look fairly good.
+# Analysis: A similar funnel pattern is observed.
 # We will try the same transforms to see if they improve things:
 
 # Try two different approaches for transforming y
@@ -439,8 +438,8 @@ plot(rstudent(mod9w.t2)); abline(h=0, lty=2)
 ######
 # mod13:
 plot(rstudent(mod13)); abline(h=0, lty=2)
-# Analysis: There is a clear funnel pattern, indicating non-constant
-# variance and that some type of transformation is likely needed
+# Analysis: There is a slight funnel pattern, and one significant outlier,
+# indicating non-constant variance and that some type of transformation is likely needed
 
 # Try two different approaches for transforming y
 mod13.t1 <- lm(log(crimes2015) ~ Population + wal, data = master)
@@ -449,17 +448,37 @@ mod13.t2 <- lm(sqrt(crimes2015) ~ Population + wal, data = master)
 # Look at summary statistics for both
 summary(mod13.t1)
 summary(mod13.t2) # This appears to be better on most fronts
+summary(mod13)
 
 # Now examine the residual plots
-plot(rstudent(mod13.t1)); abline(h=0, lty=2) # appears to be better, although has some issues
+plot(rstudent(mod13.t1)); abline(h=0, lty=2) 
 plot(rstudent(mod13.t2)); abline(h=0, lty=2) 
-# Analysis: Again, the sqrt(y) model offers some improvements.
+# Analysis: Neither of the transformed residual plots have the
+# same issue with a significant outlier, but other than this
+# they do not appear to be improvements on the non-transformed
+# model
 
 #########
 # IN SUMMARY:
-# Our optimal model for prediction was mod13.t2 which transforms the response variable to
-# sqrt(crimes2015) in order to capture the non-linear relationship, and uses only 
-# Population + wal for the predictors. 
+# After reviewing residual plots for three of our best models, there
+# are problems with non-constant variance in each, with R-student
+# residuals distributed in a funnel pattern. Thus, we attempted several 
+# transformations of our response variable to try to improve the residual
+# distribution.
+#
+# For our model with normalized crime, the best distribution of R-student
+# residuals is modh3.t2, which uses the square root of the response, along
+# with the regressors KDEraw, Population. and wal. Although the issue
+# with non-constant variance is improved, a funnel pattern can still
+# be observed in the residual plot, indicating that additional transformations
+# or polynomials might be needed.
+#
+# For our models with non-normalized crime, the ideal distribution of R-
+# student residuals is the non-transformed model for mod13 (which includes
+# regressors Population and wal); although there is still a slight funnel
+# shape to the distribution and a significant outlier appears. Neither
+# of the transformations appear to offer meaningful improvement in the 
+# distribution.
 # 
 # Throughout all the models we tested, the only variable that was significant EVERY time
 # was whether or not the store was a Walmart. Furthermore, it was the MOST significant variable
