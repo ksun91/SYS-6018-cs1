@@ -9,11 +9,47 @@ master$normalizedCrime <- master$crimes2015 / master$Percentage.hours.open.per.w
 ## create a crimesPerHour variable (basically same as normalizedCrime, but scaled)
 master$crimesPerHour <- master$crimes2015 / (master$Hours.open.per.week * 52)
 
-### Testing Multicollinearity for Income idea ~ Kevin Sun
+## TESTING FOR MULTICOLLINEARITY
+### Top-down approach: starting with ALL variables
+vif.t1 <- lm(normalizedCrime~MedIncome + Population + AvgIncome + CollegeGradPercent + IncomeInequality + Unemployment + 
+               PovertyLine + KDEraw + closest_stops_in_meters + wal, data = master)
+vif(vif.t1)
+# MedIncome > 10, remove from model
+
+vif.t2 <- lm(normalizedCrime~Population + AvgIncome + CollegeGradPercent + IncomeInequality + Unemployment + 
+               PovertyLine + KDEraw + closest_stops_in_meters + wal, data = master)
+vif(vif.t2)
+# Poverty line > 10, remove from model
+
+vif.t3 <- lm(normalizedCrime~Population + AvgIncome + CollegeGradPercent + IncomeInequality + Unemployment + 
+               KDEraw + closest_stops_in_meters + wal, data = master)
+vif(vif.t3)
+
+# College grad percent > 5, remove from model
+
+vif.t4 <- lm(normalizedCrime~Population + AvgIncome + IncomeInequality + Unemployment + 
+               KDEraw + closest_stops_in_meters + wal, data = master)
+vif(vif.t4)
+# All variables have VIF less than 5
+
+# removing IncomeInequality, since it was not calculated with Gini index
+vif.t5 <- lm(normalizedCrime~Population + AvgIncome  + Unemployment + 
+               KDEraw + closest_stops_in_meters + wal, data = master)
+
+summary(vif.t4)
+summary(vif.t5)
+# CONCLUSION (for top-down multicollinearity testing):
+# When beginning with all variables, and iteratively removing each variable with the highest VIF, we
+# arrive a model with only wal, and to a lesser extent Population, as the only significant variables
+
+### Testing Multicollinearity for Income
+# now we consider whether we should isolate the income-related variables and test for
+# multicollinearity separately.
+
 #Testing univariate cases for all income factors
 mod.income.1 <- lm(crimes2015 ~ MedIncome, data=master) #p-value = 0.01148
 mod.income.2 <- lm(crimes2015 ~ AvgIncome, data = master) #p-value = 0.01894
-mod.income.3 <- lm(crimes2015 ~ IncomeInequality, data = master) # p-value = 0.0267, sign of coefficient is opposite!!!
+mod.income.3 <- lm(crimes2015 ~ IncomeInequality, data = master) # p-value = 0.0267, sign of coefficient is opposite
 mod.income.4 <- lm(crimes2015 ~ Unemployment, data = master) #Not significant
 mod.income.5 <- lm(crimes2015 ~ PovertyLine, data = master) #p-value = 0.00924
 
@@ -33,7 +69,7 @@ vif(mod.income.6)
 mod.income.7 <- lm(crimes2015 ~ AvgIncome + PovertyLine, data = master) #no significants
 vif(mod.income.7)
 
-#New Train of thought. Looking at the summaries of mod.income.1 and mod.income.2 the model with MedIncome
+#Looking at the summaries of mod.income.1 and mod.income.2 the model with MedIncome
 #has a higher p-value and has a higher adjusted R-squared. So deciding to keep MedIncome.
 #Based on the way that we calculated Income_Inequality (look at my notes in Word Doc) 
 #and the results of an unexpected sign, we should drop Income_Inequality. 
@@ -59,15 +95,16 @@ mod.income.12 <- lm(crimes2015 ~ PovertyLine + IncomeInequality, data = master) 
 # Conclude that only PovertyLine should be the variable used to capture the realm of how income affects crime
 
 ### LOOK AT MULTICOLLINEARITY FOR OTHER VARIABLES
+# now, based on our results from testing the income-related variables, we begin testing a
+# model with only PovertyLine and ALL our non-income-related variables.
 lmAll <- lm(crimes2015 ~ Population + CollegeGradPercent + HighSchoolGradRate + PovertyLine
             + KDEraw + closest_stops_in_meters + Hours.open.per.week 
             + Percentage.hours.open.per.week + wal, master)
 summary(lmAll)
 alias(lmAll)
-#There is collinearity between Hours.open.per.week and Percentage.hours.open.per.week, which makes
+#There is perfect collinearity between Hours.open.per.week and Percentage.hours.open.per.week, which makes
 #sense so we need to remove one of the two from our model
 vif(lmAll)
-#> vif(lmAll)
 #Error in vif.default(lmAll) : there are aliased coefficients in the model
 #This justifies our perfect collinearity assumption 
 
@@ -77,9 +114,8 @@ lmAll.1 <- lm(crimes2015 ~ Population + CollegeGradPercent + HighSchoolGradRate 
 summary(lmAll.1)
 #no variable offers significance 
 alias(lmAll.1)
-#no apparent correlation in our model
+#the alias() shows no apparent correlation in our model
 vif(lmAll.1)
-#> vif(lmAll.1)
 #Population      CollegeGradPercent      HighSchoolGradRate             PovertyLine 
 #2.322978                5.457126               18.317744               13.600760 
 #KDEraw closest_stops_in_meters     Hours.open.per.week                     wal 
@@ -90,10 +126,7 @@ lmAll.1.1 <- lm(crimes2015 ~ Population + CollegeGradPercent + PovertyLine
                 + KDEraw + closest_stops_in_meters + Hours.open.per.week + wal, master)
 summary(lmAll.1)
 #no variable offers significance 
-alias(lmAll.1)
-#no apparent correlation in our model
 vif(lmAll.1.1)
-# > vif(lmAll.1.1)
 # Population      CollegeGradPercent             PovertyLine                  KDEraw 
 # 2.037338                3.982054                4.477668                2.280756 
 # closest_stops_in_meters     Hours.open.per.week                     wal 
@@ -105,15 +138,18 @@ lmAll.1.2 <- lm(crimes2015 ~ Population + CollegeGradPercent + PovertyLine
                 + KDEraw + closest_stops_in_meters+ wal, master)
 summary(lmAll.1.2)
 #wal offers significance and Population has a p-value of 0.059, the others do not offer significance  
-alias(lmAll.1.2)
 vif(lmAll.1.2)
-# > vif(lmAll.1.2)
 # Population      CollegeGradPercent             PovertyLine                  KDEraw 
 # 2.016752                3.982034                4.441259                2.269671 
 # closest_stops_in_meters                     wal 
 # 1.367480                1.164824 
 
 # now no variable has a VIF above 5, so we move on to testing some combinations
+
+## CONCLUSION (from bottom-up approach):
+summary(lmAll.1.2)
+# using the bottom-up approach to multicollinearity testing yielded the same results as
+# before. Walmart, and to a lesser degree Population, were the only significant variables.
 
 ## TEST A BUNCH OF DIFFERENT COMBINATIONS OF VARIABLES
 # this function just prints any variables with < .05 p-values
