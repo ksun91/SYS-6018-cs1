@@ -63,13 +63,6 @@ addyPart <- function(addToCheck, addS) {
   }
 }
 
-##BEGIN Removing commas from various appropriate columns in econ dataframe ~Kevin Sun
-# econ$AvgIncome <- as.numeric(gsub(",","",econ$AvgIncome))
-# econ$MedIncome <- as.numeric(gsub(",","",econ$MedIncome))
-# econ$IncomeInequality <- as.numeric(gsub(",","",econ$IncomeInequality))
-# write.csv(econ, "data/socio_econ.csv")
-###END Removing commas from various appropriate columns in econ dataframe ~Kevin Sun
-
 # make a list with a data frame for each store and all its crimes
 scdf <- lapply(stores$address, getCrimes, crimes = crimes)
 
@@ -165,13 +158,3 @@ master <- subset(master,
                  select = -c(X, Lat.y, Long.y, City, State,
                     average.SAT.score, High.school.drop., TotStud))
 #write.csv(master, "MASTER_DATA.csv", row.names=F)
-
-# ###BEGIN Subset and save master2 ~ Kevin Sun
-# #Removing duplicate column names in master (crimes2015)
-# master <- master[, !duplicated(colnames(master))]
-# #Removing unncessary columns
-# master <- subset(master,
-#                  select = -c(Lat.y, Long.y, City, State,
-#                              average.SAT.score, High.school.drop., TotStud))
-# #write.csv(master, "MASTER_DATA.csv", row.names=F)
-# ### END Subset and save master 2 ~ Kevin Sun

@@ -45,3 +45,34 @@ ggplot(dfres, aes(x=id, y= crimes)) +
   xlab("") + ylab("Residuals") + 
   geom_hline(yintercept = 0, colour="grey", linetype = "longdash")
 
+
+# pick the row to duplicate
+wl <- master[22, ]
+
+# duplicate it 5 times
+wcopy <- wl
+for (i in 1:4) {
+  wcopy <- rbind(wcopy, wl)
+}
+
+# change the store names
+for (i in 1:5) {
+  wcopy$store[i] <- unique(master$store)[i]
+}
+wcopy$wal <- ifelse(wcopy$store=="Walmart", 1, 0)
+
+wcopy$mod.mod9w <- predict(lm(crimes2015 ~ KDEraw + store, data = master), newdata=wcopy)
+wcopy$mod.mod13 <- predict(lm(crimes2015 ~ store + Population, data=master), newdata=wcopy)
+wcopy$mod.modh3 <- predict(lm(normalizedCrime ~ store + Population + KDEraw, data=master), newdata=wcopy)
+
+wcl <- wcopy[,c(1, (ncol(wcopy)-2):ncol(wcopy))]
+
+wcl <-reshape(wcl, direction = "long", varying = 2:4, sep = ".")
+names(wcl)[2:3] <- c("mod", "crimes")
+
+wcl$Model <- ifelse(wcl$mod=="mod9w", "store + KDE", ifelse(wcl$mod=="mod13", "store + Population", "normalized"))
+
+ggplot(wcl, aes(x=store, y=crimes)) + 
+  geom_point(aes(color=Model)) +
+  ggtitle("Predicted Crimes at 2525 W Anderson Ln") +
+  xlab("") + ylab("Predicted Number of Crimes")
