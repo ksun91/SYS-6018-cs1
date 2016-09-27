@@ -164,6 +164,10 @@ sigVars <- function(mod) {
 
 #######
 
+mod1 <- lm(crimes2015 ~ CollegeGradPercent + PovertyLine + KDEraw + Population + wal, data = master)
+sigVars(mod1)
+mod2 <- lm(crimes2015 ~ Population + KDEraw + CollegeGradPercent + wal, data = master)
+sigVars(mod2)
 mod3 <- lm(crimes2015 ~ CollegeGradPercent, data = master)
 sigVars(mod3)
 mod4 <- lm(crimes2015 ~ CollegeGradPercent + wal, data = master)
@@ -188,8 +192,7 @@ mod12 <- lm(crimes2015 ~ KDEraw + closest_stops_in_meters + wal, data = master)
 sigVars(mod12)
 mod13 <- lm(crimes2015 ~ Population + wal, data = master)
 sigVars(mod13)
-mod14 <- lm(crimes2015 ~ Population + KDEraw + CollegeGradPercent + wal, data = master)
-sigVars(mod14)
+
 
 ## look at the predictions
 preds1 <- data.frame(store = as.factor(master$store),
